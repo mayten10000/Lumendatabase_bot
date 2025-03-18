@@ -1,19 +1,17 @@
 import logging
-import aiohttp
-import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import Message
+import aiohttp
 from bs4 import BeautifulSoup
-import feedparser
+import asyncio
+from aiocache import cached
 
-# Настройки RSS
-RSS_URL = "https://lumendatabase.org/notices_feed?format=rss"
 
+# Настройки
 logging.basicConfig(level=logging.INFO)
 
-CHAT_ID = 5028575934
-API_TOKEN = '7897800053:AAG0gOh2OGfsa1Cd_sV-x3fFAMjtw-qs6N8'
+API_TOKEN = '7897800053:AAG0gOh2OGfsa1Cd_sV-x3fFAMjtw-qs6N8'  # Замените на ваш токен
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -23,24 +21,28 @@ async def send_welcome(message: Message):
     await message.reply("Привет! Я бот для работы с Lumendatabase. Нажми /check_notifications")
 
 @dp.message(Command("check_notifications"))
+
 async def check_notifications(message: Message):
-    await message.reply("Проверка...")
+    await message.reply("Проверка уведомлений...")
 
-    page_url = "https://www.lumendatabase.org/notices"
-
+    page_url = "https://lumendatabase.org/notices/search?term=youtube.com&sort_by="
     notifications = await parser_lumen(page_url)
 
     if notifications:
         for notice in notifications:
             await message.answer(
-                f"Уведомление: {notice.get('title', 'Без названия')}\nСсылка: {notice.get('url', 'Нет ссылки')}")
+                f"Уведомление: {notice.get('title', 'Без названия')}\nСсылка: {notice.get('url', 'Нет ссылки')}"
+            )
     else:
         await message.reply("Уведомлений нет")
 
     await message.reply("Успешно")
 
+
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+@cached(ttl=60)
 async def parser_lumen(page_url: str):
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         try:
             async with session.get(page_url) as response:
                 if response.status == 200:
@@ -49,13 +51,14 @@ async def parser_lumen(page_url: str):
                     notices = []
 
                     # Пример парсинга (замените селекторы на реальные)
-                    for item in soup.select('.notice-item'):  # Замените на реальный CSS-селектор
-                        title = item.select_one('.title').text.strip() if item.select_one('.title') else "Без названия"
+                    for item in soup.select('li.notice.result'):  # Контейнер для уведомления
+                        title = item.select_one('h3.title a').text.strip() if item.select_one('.title') else "Без названия"
                         url = item.select_one('a')['href'] if item.select_one('a') else "#"
                         notices.append({
                             "title": title,
-                            "url": f"https://www.lumendatabase.org{url}"
+                            "url": f"https://www.lumendatabase.org{url}"  # Полный URL
                         })
+                        await asyncio.sleep(2)
 
                     return notices
                 else:
@@ -64,19 +67,6 @@ async def parser_lumen(page_url: str):
         except Exception as e:
             logging.error(f"Ошибка при подключении к сайту: {e}")
             return []
-
-async def send_notification(title, link):
-    try:
-        await bot.send_message(CHAT_ID, f"Новое уведомление: {title}\nСсылка: {link}")
-        print(f"Уведомление отправлено: {title}")
-    except Exception as e:
-        print(f"Ошибка при отправке сообщения: {e}")
-
-# Парсинг RSS
-async def check_rss():
-    feed = feedparser.parse(RSS_URL)
-    for entry in feed.entries:
-        await send_notification(entry.title, entry.link)
 
 async def main():
     await dp.start_polling(bot)
