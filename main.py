@@ -1,19 +1,18 @@
-import requests
+import logging
+import aiohttp
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import Message
-import asyncio
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
-import request
-import logging
 from bs4 import BeautifulSoup
-import aiohttp
+import feedparser
 
+# Настройки RSS
+RSS_URL = "https://lumendatabase.org/notices_feed?format=rss"
 
 logging.basicConfig(level=logging.INFO)
 
-
+CHAT_ID = 5028575934
 API_TOKEN = '7897800053:AAG0gOh2OGfsa1Cd_sV-x3fFAMjtw-qs6N8'
 
 bot = Bot(token=API_TOKEN)
@@ -21,11 +20,11 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def send_welcome(message: Message):
-    await message.reply("Привет! Я бот для работы с Lumendatabase. Прожми /check_notifications")
+    await message.reply("Привет! Я бот для работы с Lumendatabase. Нажми /check_notifications")
 
 @dp.message(Command("check_notifications"))
 async def check_notifications(message: Message):
-    await message.reply("Проврка")
+    await message.reply("Проверка...")
 
     page_url = "https://www.lumendatabase.org/notices"
 
@@ -35,11 +34,11 @@ async def check_notifications(message: Message):
         for notice in notifications:
             await message.answer(
                 f"Уведомление: {notice.get('title', 'Без названия')}\nСсылка: {notice.get('url', 'Нет ссылки')}")
-
     else:
         await message.reply("Уведомлений нет")
 
     await message.reply("Успешно")
+
 async def parser_lumen(page_url: str):
     async with aiohttp.ClientSession() as session:
         try:
@@ -65,6 +64,19 @@ async def parser_lumen(page_url: str):
         except Exception as e:
             logging.error(f"Ошибка при подключении к сайту: {e}")
             return []
+
+async def send_notification(title, link):
+    try:
+        await bot.send_message(CHAT_ID, f"Новое уведомление: {title}\nСсылка: {link}")
+        print(f"Уведомление отправлено: {title}")
+    except Exception as e:
+        print(f"Ошибка при отправке сообщения: {e}")
+
+# Парсинг RSS
+async def check_rss():
+    feed = feedparser.parse(RSS_URL)
+    for entry in feed.entries:
+        await send_notification(entry.title, entry.link)
 
 async def main():
     await dp.start_polling(bot)
