@@ -11,8 +11,6 @@ def generate_dispute_response(
     url_site=os.getenv('SITE_URL'), 
     url_answer=os.getenv('ANSWER_FORM_URL') 
     ):
-
-    print(url_abuz, url_site, url_answer, sep='\n')
     
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  # (Подумать о выборе модели)
