@@ -1,16 +1,10 @@
-import openai
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-openai.api_key = os.getenv('OPEN_API_KEY')
-
 def generate_dispute_response(
     url_abuz=os.getenv('NOTICE_URL'), 
     url_site=os.getenv('SITE_URL'), 
     url_answer=os.getenv('ANSWER_FORM_URL') 
     ):
+
+    openai.api_key = os.getenv('OPEN_API_KEY')
     
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  # (Подумать о выборе модели)
@@ -22,6 +16,3 @@ def generate_dispute_response(
         ]
     )
     return response["choices"][0]["message"]["content"] # Часть метаданных формата JSON
-
-response_text = generate_dispute_response()
-print(response_text)
