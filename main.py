@@ -23,7 +23,7 @@ def daily_check():
     # filler_g_forms() # заполнение гугл форм из ответов
     tg_bot() # вывод уведомлений (+-) и ответов (-) в тг-боте
     
-schedule.every().day.at("14:15").do(daily_check)
+schedule.every().day.at("00:00").do(daily_check) 
 
 while True:
     schedule.run_pending()  
