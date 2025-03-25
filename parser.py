@@ -61,6 +61,23 @@ async def parser_lumen():
 
                     if p == 11: break # DEL (добавить авторизацию Lumendatabase для просмотра дальше 10-ой страницы)
 
+            for notice in notices:
+                        
+                notice_url = f'https://lumendatabase.org/notices/{notice["url"]}'
+
+                async with session.get(notice_url) as notice_page:
+
+                    if notice_page.status == 200:
+                        html = await notice_page.text()
+                        soup = BeautifulSoup(html, 'html.parser')
+
+                        description = soup.select_one("div.row div.description span.field").get_text()
+
+                        notice['description'] = description
+
+                    else:
+                        print('Не удалось подключится к сайту уведомления')
+                        
             return notices  
 
         except Exception as e:
