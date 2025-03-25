@@ -77,6 +77,8 @@ async def parser_lumen():
 
                     else:
                         print('Не удалось подключится к сайту уведомления')
+
+                    await asyncio.sleep(2)
                         
             return notices  
 
