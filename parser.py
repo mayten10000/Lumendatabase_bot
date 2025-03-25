@@ -71,7 +71,7 @@ async def parser_lumen():
                         html = await notice_page.text()
                         soup = BeautifulSoup(html, 'html.parser')
 
-                        description = soup.select_one("div.row div.description span.field").get_text()
+                        description = soup.select_one("div.description span.field").get_text()
 
                         notice['description'] = description
 
