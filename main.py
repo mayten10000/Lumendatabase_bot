@@ -2,6 +2,8 @@ import schedule
 import time
 
 import parser
+import ai_handler # пока не встроен в общий процесс
+import filler_g_forms # пока не встроен в общий процесс
 import tg_bot
 
 import logging
@@ -17,8 +19,8 @@ from urllib.parse import urlencode, urlparse, parse_qs, urlunparse
 
 def daily_check():
     parser()
-    # прогон уведомлений через AI и запись ответов
-    # заполнение гугл форм из ответов
+    # ai_handler() # прогон уведомлений через AI 
+    # filler_g_forms() # заполнение гугл форм из ответов
     tg_bot() # вывод уведомлений (+-) и ответов (-) в тг-боте
     
 schedule.every().day.at("14:15").do(daily_check)
