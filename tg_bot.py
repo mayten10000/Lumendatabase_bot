@@ -20,7 +20,7 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def send_welcome(message: Message):
     if message.from_user.id == ADMIN_ID:
-        await message.reply("Привет! Я бот для работы с Lumendatabase. Нажми /check_notifications")
+        await message.reply("Привет! Я бот для работы с Lumendatabase.")
 
 async def send_notifications(message: Message):
     await message.reply("Проверка уведомлений...")
@@ -40,7 +40,7 @@ async def send_notifications(message: Message):
 
             await bot.send_message(
                 ADMIN_ID,
-                f"Уведомление: {notice}" # Изменить формат и добавить данные вывода 
+                f"{title}\nСайт: {site}\nURL уведомления: https://lumendatabase.org/notices/{notice_id}\nОтвет из встречной формы: \n{response}\n" 
             )
             
     conn.close()
