@@ -76,7 +76,7 @@ async def parser_lumen():
                         notice['description'] = description
 
                     else:
-                        print('Не удалось подключится к сайту уведомления')
+                        print('Не удалось подключится к странице уведомления')
 
                     await asyncio.sleep(2)
                         
