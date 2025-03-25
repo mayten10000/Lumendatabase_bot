@@ -12,18 +12,17 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 API_TOKEN = os.getenv('TG_API_TOKEN')
-
-print(API_TOKEN)
+ADMIN_ID = int(os.getenv('TG_ADMIN_ID'))
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def send_welcome(message: Message):
-    await message.reply("Привет! Я бот для работы с Lumendatabase. Нажми /check_notifications")
+    if message.from_user.id == ADMIN_ID:
+        await message.reply("Привет! Я бот для работы с Lumendatabase. Нажми /check_notifications")
 
-@dp.message(Command("check_notifications"))
-async def check_notifications(message: Message):
+async def send_notifications(message: Message):
     await message.reply("Проверка уведомлений...")
 
     conn = sqlite3.connect('notifications.db')
@@ -39,13 +38,15 @@ async def check_notifications(message: Message):
         
         for notice in unanswrd_notices:
 
-            await message.answer(
+            await bot.send_message(
+                ADMIN_ID,
                 f"Уведомление: {notice}" # Изменить формат и добавить данные вывода 
             )
             
     conn.close()
 
 async def main():
+    await send_notifications()
     await dp.start_polling(bot)
 
 asyncio.run(main())
