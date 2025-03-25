@@ -40,7 +40,11 @@ async def send_notifications(message: Message):
 
             await bot.send_message(
                 ADMIN_ID,
-                f"{title}\nСайт: {site}\nURL уведомления: https://lumendatabase.org/notices/{notice_id}\nОтвет из встречной формы: \n{response}\n" 
+                f"{title}\n"
+                f"Сайт: {site}\n"
+                f"URL уведомления: https://lumendatabase.org/notices/{notice_id}\n"
+                f"Текст уведомления:\n{description}\n"
+                f"Ответ из встречной формы:\n{response}"
             )
             
     conn.close()
