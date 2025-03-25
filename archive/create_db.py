@@ -11,6 +11,7 @@ def init_db():
             site TEXT,
             notice_id INTEGER,
             title TEXT,
+            description TEXT,
             response TEXT DEFAULT NULL,
             processed INTEGER DEFAULT 0
         )
