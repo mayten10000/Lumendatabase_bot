@@ -100,11 +100,11 @@ async def write_notices():
                 site_notice = notice.get('site', 'Без сайта')
                 title_notice = notice.get('title', 'Без названия')
                 id_notice = notice.get('url', 'Нет идентификатора')
+                description_notice = notice.get('description', 'Нет описания')
 
-                
                 #text_notice = f"{notice.get('title', 'Без названия')}\nСсылка на уведомление: {notice.get('url', 'Нет ссылки')}\nСсылка на сайт: {notice.get('site', 'Без сайта')}"
                 
-                cursor.execute("INSERT INTO notifications (site, notice_id, title) VALUES (?, ?, ?)", (site_notice, id_notice, title_notice))
+                cursor.execute("INSERT INTO notifications (site, notice_id, title, description) VALUES (?, ?, ?, ?)", (site_notice, id_notice, title_notice, description_notice))
                 
     conn.commit()
     conn.close()
